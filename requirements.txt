@@ -1,2 +1,6 @@
 gradio
 requests
+langchain
+langgraph
+langchain_core
+langchain_community
