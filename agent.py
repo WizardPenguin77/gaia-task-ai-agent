@@ -1,10 +1,19 @@
 import base64
+import requests
 from typing import TypedDict, Annotated
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, AnyMessage
 from langgraph.graph import START, StateGraph, add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
 from langchain_community.tools import TavilySearchResults
 from langchain_community.document_loaders import WikipediaLoader, ArxivLoader
+from app import model
+from pathlib import Path
+
+# constants
+API_URL = "https://agents-course-unit4-scoring.hf.space"
+QUESTIONS_URL = f"{API_URL}/questions"
+FILES_URL = f"{API_URL}/files"
+SUBMIT_URL = f"{API_URL}/submit"
 
 class AgentState(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
@@ -43,4 +52,78 @@ def extract_text_from_image(input_file_path: str) -> str:
     """Extracts text from an image file. Only use this tool if a file_path is currently not None in the State.
        One argument, takes in a string file path, and returns the extracted text from the image."""
     extracted_text = ""
+    try:
+        # read image and encode as base64
+        with open(input_file_path, "rb") as image_file:
+            image_bytes = image_file.read()
+
+        image_base64 = base64.encode(image_bytes).decode("utf-8")
+
+        message = [
+            HumanMessage(
+                content=[
+                    {
+                        "type": "text",
+                        "text": (
+                            "Extract all text from this image. Return only the extracted text. No explanations."
+                        ),
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/png;base64,{image_base64}"
+                        },
+                    },
+                ],
+            )
+        ]
+
+        response = model.invoke(message)
+        extracted_text += response.content + "\n\n"
+        return extracted_text.strip()
+
+    except Exception as e:
+        error_msg = f"Error extracting text: {str(e)}"
+        print(error_msg)
+        return ""
+
+def download_and_read_file(task_id: str) -> str:
+    """Download and read the file attached to the GAIA task its contents.
+       Always call this first if there is a file attached to a GAIA Task.
+       This supports file types csv, 
+       
+       One argument, the task_id that belongs to the GAIA task whose file should be downloaded and read."""
+
+    url = f"{FILES_URL}/{task_id}"
+    try:
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+
+        #get the file extension from the header
+        content_disposition = response.headers.get("content-disposition", "")
+        content_type = response.headers.get("content-type", "")
+        filename = None
+        if "filename=" in content_disposition:
+            filename = content_disposition.split("filename=")[1].strip('"')
+
+        if not filename:
+            filename = f"{task_id}.bin"
+
+        ext = Path(filename).suffix.lower()
+
+        if ext in{
+            ".csv", ".txt", ".py", ".json", ".md", ".ymal", ".html", ".xml", ""
+        }:
+            return response.text
+
+        if ext == ".xlsx":
+            import pandas as pd
+
+    except Exception as e:
+        return f"error downloading file {e}"
+
+
+    
+
+
     

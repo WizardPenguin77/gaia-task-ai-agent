@@ -3,6 +3,7 @@ import gradio as gr
 import requests
 import inspect
 import pandas as pd
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 # (Keep Constants as is)
 # --- Constants ---
@@ -10,6 +11,16 @@ DEFAULT_API_URL = "https://agents-course-unit4-scoring.hf.space"
 
 # --- Basic Agent Definition ---
 # ----- THIS IS WERE YOU CAN BUILD WHAT YOU WANT ------
+
+def build_gemini_llm():
+    """Build gemini-3.7 flash llm"""
+    gemini_key = os.environ.get("GOOGLE_API_KEY")
+    if not gemini_key:
+        raise ValueError("Google Gemini API Key not set.")
+    return ChatGoogleGenerativeAI(model="gemini-3.7-flash", temperature=0)
+
+model = build_gemini_llm()
+
 class BasicAgent:
     def __init__(self):
         print("BasicAgent initialized.")
