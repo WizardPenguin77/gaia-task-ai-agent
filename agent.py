@@ -143,7 +143,7 @@ def get_youtube_video_transcript(url: str) -> str:
        
        One Argument: A string url that is the link for the Youtube video we want the
        transcript from. """
-    
+     
     
 
 
