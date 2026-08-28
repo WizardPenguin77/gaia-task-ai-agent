@@ -143,7 +143,19 @@ def get_youtube_video_transcript(url: str) -> str:
        
        One Argument: A string url that is the link for the Youtube video we want the
        transcript from. """
-     
+
+    from youtube_transcript_api import YouTubeTranscriptApi
+    from pytube import extract
+    ytt = YouTubeTranscriptApi()
+    try: 
+        video_id = extract.video_id(url)
+        # fetch youtube transcript in multiple languages
+        video_transcript = ytt.fetch(video_id, languages=['en', 'en_us', 'en_gb'])
+
+    except Exception as e:
+        error_msg = f"Error fetching transcript from url: {url}"
+        print(error_msg)
+        return ""
     
 
 
