@@ -8,6 +8,7 @@ from langchain_community.tools import TavilySearchResults
 from langchain_community.document_loaders import WikipediaLoader, ArxivLoader
 from app import model
 from pathlib import Path
+import tempfile
 
 # constants
 API_URL = "https://agents-course-unit4-scoring.hf.space"
@@ -118,9 +119,26 @@ def download_and_read_file(task_id: str) -> str:
 
         if ext == ".xlsx":
             import pandas as pd
+            with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as file:
+                file.write(response.content)
+                temp_path = file.name
+
+            read_file = pd.read_excel(temp_path)
+            return read_file.to_string()
+        if ext == ".csv":
+            import pandas as pd
+            with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as file:
+                file.write(response.content)
+                temp_path = file.name
+            read_file = pd.read_csv(temp_path)
+            return read_file.to_string()
 
     except Exception as e:
         return f"error downloading file {e}"
+
+
+def get_youtube_video_transcript(url: str) -> str:
+    """Gets the transcript/subtitles of a given YouTube video with the provided string."""
 
 
     
