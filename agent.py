@@ -138,7 +138,11 @@ def download_and_read_file(task_id: str) -> str:
 
 
 def get_youtube_video_transcript(url: str) -> str:
-    """Gets the transcript/subtitles of a given YouTube video with the provided string."""
+    """Gets the transcript/subtitles of a given YouTube video with the provided string.
+       Necessary for tasks requiring knowing what is said in a Youtube Video.
+       
+       One Argument: A string url that is the link for the Youtube video we want the
+       transcript from."""
 
 
     
