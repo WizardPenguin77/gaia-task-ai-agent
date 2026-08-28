@@ -142,7 +142,8 @@ def get_youtube_video_transcript(url: str) -> str:
        Necessary for tasks requiring knowing what is said in a Youtube Video.
        
        One Argument: A string url that is the link for the Youtube video we want the
-       transcript from."""
+       transcript from. """
+    
     
 
 
