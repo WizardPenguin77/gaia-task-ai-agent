@@ -1,5 +1,5 @@
 ---
-title: Template Final Assignment
+title: HF AI Agent Final
 emoji: 🕵🏻‍♂️
 colorFrom: indigo
 colorTo: indigo
@@ -12,4 +12,16 @@ hf_oauth: true
 hf_oauth_expiration_minutes: 480
 ---
 
+# Langgraph AI Agent
+An AI Agent utilizing Langgraph and Langchain to pass the GAIA Level 1 question dataset in the HuggingFace AI Agents final.
+
+## Implemented Features
+- **Web search**
+- **Wikipedia search**
+- **Python code execution**
+- **YouTube transcript extraction**
+- **File downloading and analysis**
+- **Audio transcription**
+
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+
