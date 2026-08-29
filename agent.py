@@ -28,11 +28,11 @@ class AgentState(TypedDict):
     url: str | None
 
 def build_groq_llm():
-    """Build Groq groq/compound"""
+    """Build Groq qwen/qwen3.6-27b"""
     groq_key = os.environ.get("GROQ_API_KEY")
     if not groq_key:
         raise ValueError("Groq API Key not set.")
-    return ChatGroq(model="groq/compound", temperature=0)
+    return ChatGroq(model="qwen/qwen3.6-27b", temperature=0)
 
 def groq_api_key_getter():
     groq_key = os.environ.get("GROQ_API_KEY")
