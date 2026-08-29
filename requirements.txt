@@ -9,3 +9,4 @@ langchain_google_genai
 youtube_transcript_api
 pytube
 langchain_groq
+wikipedia

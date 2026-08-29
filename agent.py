@@ -9,6 +9,7 @@ from langgraph.graph import START, StateGraph, add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
 from langchain_community.tools import TavilySearchResults, tool
 from langchain_community.document_loaders import WikipediaLoader
+import wikipedia
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
 from pathlib import Path
