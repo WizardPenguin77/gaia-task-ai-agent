@@ -10,6 +10,7 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from langchain_community.tools import TavilySearchResults, tool
 from langchain_community.document_loaders import WikipediaLoader
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from pathlib import Path
 import tempfile
 
@@ -26,11 +27,11 @@ class AgentState(TypedDict):
     url: str | None
 
 def build_gemini_llm():
-    """Build gemini-3.7 flash llm"""
-    gemini_key = os.environ.get("GOOGLE_API_KEY")
+    """Build Groq qwen/qwen3-32b"""
+    gemini_key = os.environ.get("GROQ_API_KEY")
     if not gemini_key:
-        raise ValueError("Google Gemini API Key not set.")
-    return ChatGoogleGenerativeAI(model="gemini-3.7-flash", temperature=0)
+        raise ValueError("Groq API Key not set.")
+    return ChatGoogleGenerativeAI(model="qwen/qwen3-32b", temperature=0)
 
 model = build_gemini_llm()
 
