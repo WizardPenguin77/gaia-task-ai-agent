@@ -10,3 +10,4 @@ youtube_transcript_api
 pytube
 langchain_groq
 wikipedia
+langchain_cerebras

@@ -13,6 +13,7 @@ from langchain_community.document_loaders import WikipediaLoader
 import wikipedia
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
+from langchain_cerebras import ChatCerebras
 from pathlib import Path
 import tempfile
 
@@ -28,12 +29,12 @@ class AgentState(TypedDict):
     task_id: str | None
     url: str | None
 
-def build_groq_llm():
-    """Build Groq openai/gpt-oss-120b"""
-    groq_key = os.environ.get("GROQ_API_KEY")
-    if not groq_key:
-        raise ValueError("Groq API Key not set.")
-    return ChatGroq(model="openai/gpt-oss-120b", temperature=0)
+def build_cerebras_llm():
+    """Build cerebras gpt-oss-120b"""
+    cerebras_key = os.environ.get("GROQ_API_KEY")
+    if not cerebras_key:
+        raise ValueError("cerebras API Key not set.")
+    return ChatGroq(model="gpt-oss-120b", temperature=0, max_tokens = 8192)
 
 def groq_api_key_getter():
     groq_key = os.environ.get("GROQ_API_KEY")
@@ -66,7 +67,7 @@ def transcribe_with_groq_whisper(audio_file_path: str):
         response.raise_for_status()
         return response.text.strip()
 
-model = build_groq_llm()
+model = build_cerebras_llm()
 
 @tool
 def add_numbers(a: int, b: int) -> float:
@@ -88,10 +89,10 @@ def divide_numbers(a: int, b: int) -> float:
     """Divides two numbers, a by b and returns a float quotient."""
     return a / b
 
-"""@tool
+@tool
 def wikipedia_search(query: str):
-    Search wikipedia for a query and return a max of three results.
-       Takes a string query as the search query
+    """Search wikipedia for a query and return a max of three results.
+       Takes a string query as the search query"""
     try:
         search_results = WikipediaLoader(query=query, load_max_docs=3).load()
 
@@ -105,9 +106,8 @@ def wikipedia_search(query: str):
     except Exception as e:
         print(f"Wikipedia search failed for {query}: {e}")
         return f"Wikipedia search failed for {query}. Try a web search instead."
-"""
 
-wikipedia_search_tool = WikipediaQueryRun(
+wikipedia_alternate_search_tool = WikipediaQueryRun(
     api_wrapper=WikipediaAPIWrapper(
         top_k_results=3,
         doc_content_chars_max=5000
@@ -259,7 +259,8 @@ tools = [
     subtract_numbers,
     divide_numbers,
     multiply_numbers,
-    wikipedia_search_tool,
+    wikipedia_search,
+    #wikipedia_alternate_search_tool,
     get_youtube_video_transcript,
     execute_python_code,
     download_and_read_file,
