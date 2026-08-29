@@ -28,11 +28,42 @@ class AgentState(TypedDict):
     url: str | None
 
 def build_groq_llm():
-    """Build Groq openai/gpt-oss-20b"""
-    gemini_key = os.environ.get("GROQ_API_KEY")
-    if not gemini_key:
+    """Build Groq groq/compound"""
+    groq_key = os.environ.get("GROQ_API_KEY")
+    if not groq_key:
         raise ValueError("Groq API Key not set.")
-    return ChatGroq(model="openai/gpt-oss-20b", temperature=0)
+    return ChatGroq(model="groq/compound", temperature=0)
+
+def groq_api_key_getter():
+    groq_key = os.environ.get("GROQ_API_KEY")
+    if not groq_key:
+        raise ValueError("Groq API Key not set.")
+    return groq_key
+
+def transcribe_with_groq_whisper(audio_file_path: str):
+    """Send an audio file to Groq Whisper to transcribe and return the transcript."""
+    api_key = groq_api_key_getter()
+    filename = os.path.basename(audio_file_path)
+    ext = Path(filename).suffix.lower()
+
+    with open(audio_file_path, "rb") as file:
+        audio_bytes = file.read()
+        response = requests.post(
+            "https://api.groq.com/openai/v1/audio/transcriptions",
+            headers={
+                "Authorization": f"Bearer {api_key}"
+            },
+            files={
+                "file": (filename, audio_bytes, "audio/mpeg")
+            },
+            data={
+                "model": "whisper-large-v3",
+                "response_format": "text"
+            },
+            timeout=60,
+        )
+        response.raise_for_status()
+        return response.text.strip()
 
 model = build_groq_llm()
 
@@ -124,7 +155,8 @@ def extract_text_from_image(input_file_path: str) -> str:
 def download_and_read_file(task_id: str) -> str:
     """Download and read the file attached to the GAIA task its contents.
        Always call this first if there is a file attached to a GAIA Task.
-       This supports file types csv, 
+       This supports file types csv, txt, py, json, md, ymal, html, xml, xlsx, and mp3.
+       USE FOR AUDIO FILES
        
        One argument, the task_id that belongs to the GAIA task whose file should be downloaded and read."""
 
@@ -145,9 +177,7 @@ def download_and_read_file(task_id: str) -> str:
 
         ext = Path(filename).suffix.lower()
 
-        if ext in{
-            ".csv", ".txt", ".py", ".json", ".md", ".ymal", ".html", ".xml", ""
-        }:
+        if ext in(".csv", ".txt", ".py", ".json", ".md", ".ymal", ".html", ".xml", ""):
             return response.text
 
         if ext == ".xlsx" or "xlsx" in content_type:
@@ -165,6 +195,15 @@ def download_and_read_file(task_id: str) -> str:
                 temp_path = file.name
             read_file = pd.read_csv(temp_path)
             return read_file.to_string()
+        if ext in(".mp3", ".m4a", ".wav", ".ogg", ".flac" or "audio" in content_type):
+            with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as file:
+                file.write(response.content)
+                temp_path = file.name
+
+            try:
+                return transcribe_with_groq_whisper(temp_path)
+            finally:
+                os.remove(temp_path)
 
     except Exception as e:
         return f"error downloading file {e}"
@@ -242,7 +281,8 @@ def assistant(state: AgentState):
 
     download_and_read_file: Download and read the file attached to the GAIA task its contents.
        Always call this first if there is a file attached to a GAIA Task.
-       This supports file types csv, 
+       This supports file types csv, txt, py, json, md, ymal, html, xml, xlsx, and mp3.
+       USE FOR AUDIO FILES
        
        One argument, the task_id that belongs to the GAIA task whose file should be downloaded and read.
     
