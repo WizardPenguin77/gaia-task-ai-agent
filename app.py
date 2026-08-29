@@ -12,23 +12,15 @@ DEFAULT_API_URL = "https://agents-course-unit4-scoring.hf.space"
 # --- Basic Agent Definition ---
 # ----- THIS IS WERE YOU CAN BUILD WHAT YOU WANT ------
 
-def build_gemini_llm():
-    """Build gemini-3.7 flash llm"""
-    gemini_key = os.environ.get("GOOGLE_API_KEY")
-    if not gemini_key:
-        raise ValueError("Google Gemini API Key not set.")
-    return ChatGoogleGenerativeAI(model="gemini-3.7-flash", temperature=0)
-
-model = build_gemini_llm()
 
 class BasicAgent:
     def __init__(self):
         print("BasicAgent initialized.")
     def __call__(self, question: str) -> str:
         print(f"Agent received question (first 50 chars): {question[:50]}...")
-        fixed_answer = "This is a default answer."
-        print(f"Agent returning fixed answer: {fixed_answer}")
-        return fixed_answer
+        answer = model.invoke(question)
+        print(f"Agent returning answer: {answer}")
+        return answer
 
 def run_and_submit_all( profile: gr.OAuthProfile | None):
     """
