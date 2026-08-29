@@ -31,26 +31,31 @@ def build_gemini_llm():
     gemini_key = os.environ.get("GROQ_API_KEY")
     if not gemini_key:
         raise ValueError("Groq API Key not set.")
-    return ChatGoogleGenerativeAI(model="qwen/qwen3-32b", temperature=0)
+    return ChatGroq(model="qwen/qwen3-32b", temperature=0)
 
 model = build_gemini_llm()
 
+@tool
 def add_numbers(a: int, b: int) -> float:
     """Adds two numbers, a and b and returns a float sum."""
     return a + b
 
+@tool
 def subtract_numbers(a: int, b: int) -> float:
     """Subtracts two numbers, a by b and returns a float difference."""
     return a - b
 
+@tool
 def multiply_numbers(a: int, b: int) -> float:
     """Multiplies two numbers, a by b and returns a float product."""
     return a * b
 
+@tool
 def divide_numbers(a: int, b: int) -> float:
     """Divides two numbers, a by b and returns a float quotient."""
     return a / b
 
+@tool
 def wikipedia_search(query: str):
     """Search wikipedia for a query and return a max of three results.
        Takes a string query as the search query"""
@@ -66,6 +71,7 @@ tavily_key = os.environ.get("TAVILY_API_KEY")
 if tavily_key:
     web_search_tool = TavilySearchResults(max_results=5)
 
+@tool
 def extract_text_from_image(input_file_path: str) -> str:
     """Extracts text from an image file. Only use this tool if a file_path is currently not None in the State.
        One argument, takes in a string file path, and returns the extracted text from the image."""
@@ -105,6 +111,8 @@ def extract_text_from_image(input_file_path: str) -> str:
         print(error_msg)
         return ""
 
+
+@tool
 def download_and_read_file(task_id: str) -> str:
     """Download and read the file attached to the GAIA task its contents.
        Always call this first if there is a file attached to a GAIA Task.
@@ -153,7 +161,7 @@ def download_and_read_file(task_id: str) -> str:
     except Exception as e:
         return f"error downloading file {e}"
 
-
+@tool
 def get_youtube_video_transcript(url: str) -> str:
     """Gets the transcript/subtitles of a given YouTube video with the provided string.
        Necessary for tasks requiring knowing what is said in a Youtube Video.
@@ -175,6 +183,7 @@ def get_youtube_video_transcript(url: str) -> str:
         print(error_msg)
         return ""
 
+@tool
 def execute_python_code(code: str) -> str:
     """Execute Python code and return it's given output. Use for math, logic, or any tasks requiring Python code.
     
