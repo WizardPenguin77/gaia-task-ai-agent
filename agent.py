@@ -285,7 +285,7 @@ def assistant(state: AgentState):
             code: a valid string of python code to execute. Valid results must be printed to be read.
     
     get_youtube_video_transcript: Gets the transcript/subtitles of a given YouTube video with the provided string.
-       Necessary for tasks requiring knowing what is said in a Youtube Video.
+       ALWAYS USE FOR TASKS THAT REQUIRE LISTENING TO A YOUTUBE VIDEO.
        One Argument: A string url that is the link for the Youtube video we want the
        transcript from.       
 
