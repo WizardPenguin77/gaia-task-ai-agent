@@ -31,7 +31,7 @@ class AgentState(TypedDict):
 
 def build_cerebras_llm():
     """Build cerebras gpt-oss-120b"""
-    cerebras_key = os.environ.get("GROQ_API_KEY")
+    cerebras_key = os.environ.get("CEREBRAS_API_KEY")
     if not cerebras_key:
         raise ValueError("cerebras API Key not set.")
     return ChatGroq(model="gpt-oss-120b", temperature=0, max_tokens = 8192)
