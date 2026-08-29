@@ -28,11 +28,11 @@ class AgentState(TypedDict):
     url: str | None
 
 def build_groq_llm():
-    """Build Groq qwen/qwen3.8-27b"""
+    """Build Groq openai/gpt-oss-20b"""
     gemini_key = os.environ.get("GROQ_API_KEY")
     if not gemini_key:
         raise ValueError("Groq API Key not set.")
-    return ChatGroq(model="qwen/qwen3.8-27b", temperature=0)
+    return ChatGroq(model="openai/gpt-oss-20b", temperature=0)
 
 model = build_groq_llm()
 
