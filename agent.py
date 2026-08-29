@@ -27,14 +27,14 @@ class AgentState(TypedDict):
     task_id: str | None
     url: str | None
 
-def build_gemini_llm():
-    """Build Groq openai/gpt-oss-120b"""
+def build_groq_llm():
+    """Build Groq qwen/qwen3.8-27b"""
     gemini_key = os.environ.get("GROQ_API_KEY")
     if not gemini_key:
         raise ValueError("Groq API Key not set.")
-    return ChatGroq(model="openai/gpt-oss-120b", temperature=0)
+    return ChatGroq(model="qwen/qwen3.8-27b", temperature=0)
 
-model = build_gemini_llm()
+model = build_groq_llm()
 
 @tool
 def add_numbers(a: int, b: int) -> float:
@@ -60,12 +60,19 @@ def divide_numbers(a: int, b: int) -> float:
 def wikipedia_search(query: str):
     """Search wikipedia for a query and return a max of three results.
        Takes a string query as the search query"""
-    search_results = WikipediaLoader(query=query, load_max_docs=3).load()
-    return "\n\n---\n\n".join(
-        f"Title: {doc.metadata.get('title', 'Unknown')}\n"
-        f"Content: {doc.page_content}"
-        for doc in search_results
-    )
+    try:
+        search_results = WikipediaLoader(query=query, load_max_docs=3).load()
+
+        if not search_results:
+            return f"No Wikipedia results found for {query}. Consider another query or try a web search."
+        return "\n\n---\n\n".join(
+            f"Title: {doc.metadata.get('title', 'Unknown')}\n"
+            f"Content: {doc.page_content}"
+            for doc in search_results
+        )
+    except Exception as e:
+        print(f"Wikipedia search failed for {query}: {e}")
+        return f"Wikipedia search failed for {query}. Try a web search instead."
 
 
 tavily_key = os.environ.get("TAVILY_API_KEY")
