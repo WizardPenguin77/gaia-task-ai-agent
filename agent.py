@@ -7,7 +7,8 @@ from typing import TypedDict, Annotated
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, AnyMessage
 from langgraph.graph import START, StateGraph, add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
-from langchain_community.tools import TavilySearchResults, tool
+from langchain_community.tools import TavilySearchResults, WikipediaQueryRun, tool
+from langchain_community.utilities import WikipediaAPIWrapper
 from langchain_community.document_loaders import WikipediaLoader
 import wikipedia
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -87,10 +88,10 @@ def divide_numbers(a: int, b: int) -> float:
     """Divides two numbers, a by b and returns a float quotient."""
     return a / b
 
-@tool
+"""@tool
 def wikipedia_search(query: str):
-    """Search wikipedia for a query and return a max of three results.
-       Takes a string query as the search query"""
+    Search wikipedia for a query and return a max of three results.
+       Takes a string query as the search query
     try:
         search_results = WikipediaLoader(query=query, load_max_docs=3).load()
 
@@ -104,7 +105,14 @@ def wikipedia_search(query: str):
     except Exception as e:
         print(f"Wikipedia search failed for {query}: {e}")
         return f"Wikipedia search failed for {query}. Try a web search instead."
+"""
 
+wikipedia_search_tool = WikipediaQueryRun(
+    api_wrapper=WikipediaAPIWrapper(
+        top_k_results=3,
+        doc_content_chars_max=5000
+    )
+)
 
 tavily_key = os.environ.get("TAVILY_API_KEY")
 if tavily_key:
@@ -251,11 +259,12 @@ tools = [
     subtract_numbers,
     divide_numbers,
     multiply_numbers,
-    wikipedia_search,
+    wikipedia_search_tool,
     get_youtube_video_transcript,
     execute_python_code,
     download_and_read_file,
     extract_text_from_image,
+    web_search_tool,
 ]
 
 model_with_tools = model.bind_tools(tools)
@@ -286,8 +295,10 @@ def assistant(state: AgentState):
        
        One argument, the task_id that belongs to the GAIA task whose file should be downloaded and read.
     
-    wikipedia_search: Search wikipedia for a query and return a max of three results.
+    wikipedia_search_tool: Search wikipedia for a query and return a max of three results.
        Takes a string query as the search query
+    
+    web_search_tool: Search Tavily for a query and return the top 5 search results.
     
     add_numbers: a + b
     subtract_numbers: a - b
