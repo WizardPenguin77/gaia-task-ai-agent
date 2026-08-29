@@ -3,7 +3,8 @@ import gradio as gr
 import requests
 import inspect
 import pandas as pd
-from langchain_google_genai import ChatGoogleGenerativeAI
+from agent import graph
+from langchain_core.messages import HumanMessage
 
 # (Keep Constants as is)
 # --- Constants ---
@@ -17,10 +18,13 @@ class BasicAgent:
     def __init__(self):
         print("BasicAgent initialized.")
     def __call__(self, question: str) -> str:
-        print(f"Agent received question (first 50 chars): {question[:50]}...")
-        answer = model.invoke(question)
-        print(f"Agent returning answer: {answer}")
-        return answer
+        answer = graph.invoke({
+            "messages": [HumanMessage(content=question)],
+            "file_path": None,
+            "url": None,
+            "task_id": None
+        })
+        return answer["messages"][-1].content
 
 def run_and_submit_all( profile: gr.OAuthProfile | None):
     """
